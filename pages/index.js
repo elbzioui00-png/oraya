@@ -413,7 +413,7 @@ export default function Home() {
             <div className="feature">
               <img src="https://img.icons8.com/ios/50/000000/cash-on-delivery.png" alt="Paiement à la livraison" />
               <div>
-                <h3>Paiement À La Livraison</h3>
+                <h3>Paiement a La Livraison</h3>
                 <p>We’ll help you get it just right if it doesn’t fit.</p>
               </div>
             </div>
