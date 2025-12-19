@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Commandes reçues</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f5f6fa;
+      padding: 20px;
+      color: #222;
+    }
+    h1 {
+      color: #2f3640;
+      margin-bottom: 20px;
+    }
+    .order {
+      background: white;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      position: relative;
+    }
+    .order h2 {
+      margin: 0 0 8px 0;
+      font-size: 18px;
+      color: #273c75;
+    }
+    .items {
+      margin-top: 8px;
+      font-size: 14px;
+      color: #444;
+    }
+    .total {
+      font-weight: bold;
+      margin-top: 6px;
+      color: #192a56;
+    }
+    .status {
+      margin-top: 10px;
+      font-weight: bold;
+      padding: 6px 10px;
+      border-radius: 8px;
+      display: inline-block;
+    }
+    .status.pending { background: #f1c40f33; color: #cfa707; }
+    .status.ongoing { background: #00a8ff33; color: #0097e6; }
+    .status.refused { background: #e8411833; color: #c23616; }
+    .status.done { background: #4cd13733; color: #44bd32; }
+
+    .actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    button {
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.1s ease;
+    }
+    button:hover {
+      transform: scale(1.05);
+    }
+    .btn-validate { background: #00a8ff; color: white; }
+    .btn-refuse { background: #e84118; color: white; }
+    .btn-done { background: #44bd32; color: white; }
+    .delete-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #e84118;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      line-height: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>📦 Commandes reçues</h1>
+  <div id="orders"></div>
+
+  <script>
+    const ordersEl = document.getElementById('orders');
+
+    // Charger les commandes
+    let orders = JSON.parse(localStorage.getItem('all_orders') || '[]');
+
+    function saveOrders() {
+      localStorage.setItem('all_orders', JSON.stringify(orders));
+    }
+
+    function renderOrders() {
+      ordersEl.innerHTML = '';
+
+      if (orders.length === 0) {
+        ordersEl.innerHTML = "<p>Aucune commande reçue pour l’instant.</p>";
+        return;
+      }
+
+      orders.sort((a, b) => b.id - a.id);
+
+      orders.forEach((o, index) => {
+        const div = document.createElement('div');
+        div.className = 'order';
+
+        // Déterminer l'état visuel
+        let statusText = "En attente";
+        let statusClass = "pending";
+        if (o.status === "en_cours") {
+          statusText = "En cours";
+          statusClass = "ongoing";
+        } else if (o.status === "refusee") {
+          statusText = "Commande refusée";
+          statusClass = "refused";
+        } else if (o.status === "recue") {
+          statusText = "Reçue par client";
+          statusClass = "done";
+        }
+
+        div.innerHTML = `
+          <button class="delete-btn" title="Supprimer la commande">×</button>
+          <h2>Commande #${o.id}</h2>
+          <div><strong>Nom:</strong> ${o.name}</div>
+          <div><strong>Adresse:</strong> ${o.address}</div>
+          <div><strong>Téléphone:</strong> ${o.phone}</div>
+          <div><strong>Date:</strong> ${o.date}</div>
+
+          <div class="items">
+            <strong>Articles :</strong><br>
+            ${o.items.map(it => `- ${it.name} × ${it.qty} = ${it.total} dh`).join('<br>')}
+          </div>
+          <div class="items">- Livraison: 45 dh</div>
+          <div class="total">Total : ${o.total} dh</div>
+
+          <div class="status ${statusClass}">${statusText}</div>
+
+          <div class="actions">
+            <button class="btn-validate">✅ Valider</button>
+            <button class="btn-refuse">❌ Refuser</button>
+            <button class="btn-done">📦 Reçue par client</button>
+          </div>
+        `;
+
+        // --- Bouton Supprimer ---
+        div.querySelector('.delete-btn').addEventListener('click', () => {
+          if (confirm("Supprimer cette commande ?")) {
+            orders.splice(index, 1);
+            saveOrders();
+            renderOrders();
+          }
+        });
+
+        // --- Bouton Valider ---
+        div.querySelector('.btn-validate').addEventListener('click', () => {
+          o.status = "en_cours";
+          saveOrders();
+          renderOrders();
+        });
+
+        // --- Bouton Refuser ---
+        div.querySelector('.btn-refuse').addEventListener('click', () => {
+          o.status = "refusee";
+          saveOrders();
+          renderOrders();
+        });
+
+        // --- Bouton Reçue ---
+        div.querySelector('.btn-done').addEventListener('click', () => {
+          o.status = "recue";
+          saveOrders();
+          renderOrders();
+        });
+
+        ordersEl.appendChild(div);
+      });
+    }
+
+    renderOrders();
+  </script>
+</body>
+</html>

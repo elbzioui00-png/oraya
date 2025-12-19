@@ -1,0 +1,26 @@
+{
+  "name": "next-js-test",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^12.5.0",
+    "iron-session": "^8.0.4",
+    "joi": "^18.0.2",
+    "next": "^14.2.3",
+    "next-iron-session": "^4.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.3"
+  }
+}
